@@ -31,6 +31,15 @@ const UserForm = ({ touched, errors, status }) => {
                     {touched.password && errors.password && (
                         <p className="errors">{errors.password}</p>)}
                 </label>
+                <Field name="role" as="select">
+                    <option disabled value="default">Select Role</option>
+                    <option value="CEO">CEO</option>
+                    <option value="CFO">CFO</option>
+                    <option value="CTO">CTO</option>
+                    <option value="Intern">Intern</option>
+                </Field>
+                {touched.role && errors.role && (
+                    <p className="errors">{errors.role}</p>)}
                 <label htmlFor="checkbox">
                     <Field id="checkbox" name="checkbox" type="checkbox" />
                     I have read and agree to the Terms of Service
@@ -44,6 +53,7 @@ const UserForm = ({ touched, errors, status }) => {
                     <h2>{user.name}</h2>
                     <p>Email: {user.email}</p>
                     <p>Password: {user.password}</p>
+                    <p>Role: {user.role}</p>
                     <p>Agreed to terms: {`${user.checkbox}`}</p>
                 </div>
             ))}
@@ -52,11 +62,12 @@ const UserForm = ({ touched, errors, status }) => {
 }
 
 const FormikUserForm = withFormik({
-    mapPropsToValues({ name, email, password, checkbox }) {
+    mapPropsToValues({ name, email, password, role, checkbox }) {
         return {
             name: name || "",
             email: email || "",
             password: password || "",
+            role: role || "default",
             checkbox: checkbox || false
         };
     },
@@ -64,9 +75,11 @@ const FormikUserForm = withFormik({
         name: Yup.string().required(),
         email: Yup.string().email().required(),
         password: Yup.string().required(),
+        role: Yup.string().oneOf(['CFO', 'CTO', 'CEO', 'Intern']),
         checkbox: Yup.boolean().oneOf([true], "Must accept terms and conditions.")
     }),
     handleSubmit(values, { setStatus, resetForm }) {
+        console.log(values);
         axios.post("https://reqres.in/api/users", values)
             .then(res => {
                 console.log(res);
